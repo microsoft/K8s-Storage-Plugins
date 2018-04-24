@@ -6,10 +6,10 @@
 Steps - assume c:\code is where /flexvolume/windows/plugins is mounted and run from cmd.exe
 
     #create image run from /flexvolume/windows
-    docker build -t --isolation=hyperv vs_build:1 vs_build
+    docker build --isolation=hyperv -t vs_build:1 vs_build
 
     #compile iscsiHelper ito output folder    
-    docker run --rm -it --isolation=hyperv -v %cd%\plugins:c:\code vs_build:1 cmd /C c:\code\vs_build\buildscript.cmd
+    docker run --rm -it --isolation=hyperv -v %cd%:c:\code vs_build:1 cmd /C c:\code\vs_build\buildscript.cmd
   
   
   
