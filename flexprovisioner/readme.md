@@ -83,7 +83,7 @@ ISCSI_REVERSE_CHAP_PASSWORD | Reverse chap password for iSCSI | - [x]
 * copy src/* & flex-provisioner.exe into some folder
 * Run under domain account that has access to storage
     * sample usage
-        * c:\provisioner\flex-provisioner.exe -logtostderr -provisioner windows-server-storage-provisioner -execCommand c:\provisioner\flex.cmd -master http://master:8080
+        * c:\provisioner\flex-provisioner.exe -logtostderr -provisioner microsoft.com/windows-server-storage-provisioner -execCommand c:\provisioner\flex.cmd -master http://master:8080
     * flex-provisioner.exe --help for more info
     * If using a container see gmsa setup https://blogs.msdn.microsoft.com/containerstuff/2017/01/30/create-a-container-with-active-directory-support/
     * Currently cannot create container using gmsa in kubernetes, see https://github.com/kubernetes/kubernetes/issues/62038

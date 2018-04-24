@@ -49,7 +49,7 @@ The default plugin folder location is C:\usr\libexec\kubernetes\kubelet-plugins\
     * Copy microsoft.com~iscsi.cmd into the plugin folder
     * Copy the binary produced by iscsiHelper into microsoft.com~iscsi.cmd on the same nodes.
     * Install the approrpiate Visual Studio C++ redistributuable on all nodes
-        * https://aka.ms/vs/15/release/vc_redist.x64.exe\
+        * https://aka.ms/vs/15/release/vc_redist.x64.exe
     * Optionally create a pr.txt file in the current working directory that corresponds to that node's SCSI PR to use
         * If none is created a random one will be generated
 
