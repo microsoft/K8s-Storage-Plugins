@@ -20,4 +20,4 @@ spec:
       secretRef:
         name: "smb-secret"
       options:
-        sharename: "\\\\Server\\Share\\optional\\sub\\path"
+        source: "\\\\Server\\Share\\optional\\sub\\path"

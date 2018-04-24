@@ -17,7 +17,7 @@ function mount_command([string]$path, $options)
 {  
     $passPlain = Base64Decode $($options.'kubernetes.io/secret/password')
     $User = Base64Decode $($options.'kubernetes.io/secret/username')
-    $remoteP = $options.shareName
+    $remoteP = $options.source
   
     DebugLog  $passPlain
     DebugLog  $User
