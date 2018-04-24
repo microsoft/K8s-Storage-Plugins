@@ -1,9 +1,9 @@
-# Microsoft Flex provisioner scripts
-Here are some scripts that can be used with the (currently forked) external flex provisioner available https://github.com/KnicKnic/external-storage/tree/script_interface/flex . This provisioner currently will provision SMB and iSCSI volumes against a windows server.
+# Flex provisioner scripts
+**Status is alpha, variable names may change and tests are not exhaustive**
 
-For more info on Flexvolume see
- * https://github.com/kubernetes/community/blob/master/contributors/devel/flexvolume.md
- * <TBD> pointer to MSFT SMB & iSCSI pointers
+Here are some scripts sample scripts that will work with external flex provisioner (located at https://github.com/kubernetes-incubator/external-storage/tree/master/flex ). Currently I am utilizing the forked branch https://github.com/KnicKnic/external-storage/tree/script_interface/flex . This provisioner currently will provision SMB and iSCSI volumes against a windows server.
+
+For more info on Flexvolume see [SMB & iSCSI windows FlexVolume plugins](../flexvolume/windows)
 
  ## StorageClass Parameters
  *Note when params use \"quotes\"

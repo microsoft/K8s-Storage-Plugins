@@ -1,4 +1,4 @@
-# Microsoft Flexvolume Kubernetes Plugins
+# Flexvolume Kubernetes Plugins
 Here are implementations of flexvolume in kubernetes for iSCSI and SMB. Also helps serve as a scaffolding for building future volume plugins in powershell on windows.
 
 For more info on Flexvolume see
