@@ -1,0 +1,13 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fast
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: microsoft.com/foo
+parameters:
+  #start of SMB parameters
+  smbShareName: \\nmaliwa-vm-1103\Shared
+  smbLocalPath: c:\smbkube
+  smbServerName: nmaliwa-vm-1103
+  smbSecret: smb-secret

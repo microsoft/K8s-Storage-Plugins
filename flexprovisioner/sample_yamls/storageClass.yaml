@@ -1,0 +1,25 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fast
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: microsoft.com/windows-server-storage-provisioner
+parameters:
+  #start of iscsi parameters
+  iscsiLocalPath: c:\smbkube
+  iscsiServerName: nmaliwa-vm-1003
+  iscsiAuthType: NONE
+  iscsiSecret: forward-secret
+  iscsiFsType: NTFS
+  iscsiChapAuthDiscovery: "false"
+  iscsiChapAuthSession: "false"
+  iscsiTargetPortal: nmaliwa-vm-1003
+  #iscsiPortals: "1.1.1.1,2.1.2.2:324"
+  #iscsiUseFixed: "false"
+  #start of SMB parameters
+  smbShareName: \\nmaliwa-vm-1003\Shared
+  smbLocalPath: c:\smbkube
+  smbServerName: nmaliwa-vm-1003
+  smbSecret: smb-secret
+  #smbNoQuota: "false"
