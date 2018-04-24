@@ -29,10 +29,10 @@ For more info on Flexvolume see
     * All files for smb plugin
 * sample_yamls
     * some yamls that demonstrate howto use the plugins
-* scriptrunner
+* utils/scriptrunner
     * Serves as a basis for building plugins
     * These files are symlinked into plugin directories
-* iscsiHelper
+* utils/iscsiHelper
     * Contains a c++ commandline application that provides some storage features used by iscsi.cmd
 * vs_build
     * Setup a container with Visual Studio 2017 & SDK to build iscsiHelper.exe
