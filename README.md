@@ -2,6 +2,9 @@
 # FlexVolumes
 See [flexvolume/windows](flexvolume/windows)
 
+# FlexProvisioner
+See [flexprovisioner](flexprovisioner)
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a

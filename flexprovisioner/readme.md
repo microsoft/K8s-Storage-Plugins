@@ -69,6 +69,7 @@ You can configure one storage class to provision for iSCSI and/or SMB.
 
 ### Environment variables
 If it is a secret first look at the environment variable and load it, otherwise we append _FILE and try to read that file.
+
 Environment Name | Meaning | Is a secret
 --- | --- | ----
 ISCSI_CHAP_USERNAME | Chap username for iSCSI | - [x]
@@ -78,7 +79,7 @@ ISCSI_REVERSE_CHAP_PASSWORD | Reverse chap password for iSCSI | - [x]
 
 ## Deploying
 * Build flex-provisioner.exe
-     * See build/make.ps1
+     * See [build](build)
 * copy src/* & flex-provisioner.exe into some folder
 * Run under domain account that has access to storage
     * sample usage
