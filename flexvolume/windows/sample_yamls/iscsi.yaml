@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: iscsi
+  namespace: default
+spec:
+  restartPolicy: Never
+  containers:
+  - name: iscsi
+    image: microsoft/nanoserver
+    command: ["C:\\Windows\\System32\\cmd.exe"]
+    args: ["/C", "echo", "0", ">", "c:\\d\\iscsi_test.txt"]
+    volumeMounts:
+    - name: iscsi-volume
+      mountPath: /d
+  volumes:
+  - name: iscsi-volume
+    flexVolume:
+      driver: "microsoft.com/iscsi.cmd"
+      fsType: "NTFS"
+      secretRef:
+        name: "iscsi-secret"
+      readOnly: false
+      options:
+        chapAuthDiscovery:  "false"
+        chapAuthSession:  "true"
+        targetPortal:  "server"
+        portals:  "server_alternativeip,server_alternativeip2:optionalport"
+        iqn:  "iqn.1991-05.com.microsoft:server-target"
+        lun:  "0"
+        authType:  "ONEWAYCHAP"

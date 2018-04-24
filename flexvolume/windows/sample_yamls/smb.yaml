@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smb
+  namespace: default
+spec:
+  restartPolicy: Never
+  containers:
+  - name: smb
+    image: microsoft/nanoserver
+    command: ["C:\\Windows\\System32\\cmd.exe"]
+    args: ["/C", "echo", "0", ">", "c:\\d\\smb_test.txt"]
+    volumeMounts:
+    - name: smb-volume
+      mountPath: /d
+  volumes:
+  - name: smb-volume
+    flexVolume:
+      driver: "microsoft.com/smb.cmd"
+      secretRef:
+        name: "smb-secret"
+      options:
+        source: "\\\\Server\\Share\\optional\\sub\\path"
