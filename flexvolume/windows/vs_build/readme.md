@@ -3,13 +3,13 @@
 * **Beware the produced image file is quite large 25+GB, this container was not optimized for size.**
 * **You do not need this if you have Visual Studio and the SDK installed.**
 
-Steps - assume c:\code is where the root of the repository is mounted and run from cmd.exe
+Steps - assume c:\code is where /flexvolume/windows/plugins is mounted and run from cmd.exe
 
-    #create image run from repository root
-    docker build -t vs_build:1 vs_build
+    #create image run from /flexvolume/windows
+    docker build -t --isolation=hyperv vs_build:1 vs_build
 
     #compile iscsiHelper ito output folder    
-    docker run --rm -it -v %cd%\plugins:c:\code vs_build:1 cmd /C c:\code\vs_build\buildscript.cmd
+    docker run --rm -it --isolation=hyperv -v %cd%\plugins:c:\code vs_build:1 cmd /C c:\code\vs_build\buildscript.cmd
   
   
   
