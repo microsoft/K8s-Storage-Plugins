@@ -6,6 +6,8 @@ For more info on Flexvolume see
  * https://docs.openshift.org/latest/install_config/persistent_storage/persistent_storage_flex_volume.html#flex-volume-drivers-without-master-initiated-attach-detach
 
 
+**Code is currently alpha, names may change, all tests have not been performed**
+
  ## Plugins
 * SMB
     * This plugin allows you to use SMB shares. 
