@@ -22,10 +22,10 @@ For more info on Flexvolume see
     * Provides fencing through the use of SCSI Persistent Reservations
 
 ## Folder structure
-* microsoft.com~iscsi.cmd
+* plugins/microsoft.com~iscsi.cmd
     * All powershell files needed for iscsi plugin
     * When deploying must add iscsiHelper.exe
-* microsoft.com~smb.cmd
+* plugins/microsoft.com~smb.cmd
     * All files for smb plugin
 * sample_yamls
     * some yamls that demonstrate howto use the plugins
@@ -44,9 +44,9 @@ For more info on Flexvolume see
 ## Deployment guide
 The default plugin folder location is C:\usr\libexec\kubernetes\kubelet-plugins\volume\exec\
 * SMB
-    * Copy microsoft.com~smb.cmd into the plugin folder
+    * Copy plugins/microsoft.com~smb.cmd into the plugin folder
 * ISCI
-    * Copy microsoft.com~iscsi.cmd into the plugin folder
+    * Copy plugins/microsoft.com~iscsi.cmd into the plugin folder
     * Copy the binary produced by iscsiHelper into microsoft.com~iscsi.cmd on the same nodes.
     * Install the approrpiate Visual Studio C++ redistributuable on all nodes
         * https://aka.ms/vs/15/release/vc_redist.x64.exe
