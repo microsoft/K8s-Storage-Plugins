@@ -45,7 +45,7 @@ For more info on Flexvolume see
 The default plugin folder location is C:\usr\libexec\kubernetes\kubelet-plugins\volume\exec\
 * SMB
     * Copy plugins/microsoft.com~smb.cmd into the plugin folder
-* ISCI
+* ISCSI
     * Copy plugins/microsoft.com~iscsi.cmd into the plugin folder
     * Copy the binary produced by iscsiHelper into microsoft.com~iscsi.cmd on the same nodes.
     * Install the approrpiate Visual Studio C++ redistributuable on all nodes
