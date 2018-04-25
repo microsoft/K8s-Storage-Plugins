@@ -1,6 +1,6 @@
 
 # FlexVolume
-See [flexvolume/windows](flexvolume/windows) for kuberentes plugins that can mount iSCSI and SMB.
+See [flexvolume/windows](flexvolume/windows) for kubernetes flexvolume plugins that can mount iSCSI and SMB on windows.
 
 # FlexProvisioner
 See [flexprovisioner](flexprovisioner) for an example kubernetes storage provisioner that given a window server can provision SMB and iSCSI volumes.
