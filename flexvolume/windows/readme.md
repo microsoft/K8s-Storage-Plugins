@@ -8,7 +8,26 @@ For more info on Flexvolume see
 
 **Code is currently alpha, names may change, all tests have not been performed**
 
+## Deployment guide
+The default plugin folder location in a windows kubernetes worker node is C:\usr\libexec\kubernetes\kubelet-plugins\volume\exec\
+* SMB
+    * Copy plugins/microsoft.com~smb.cmd into the plugin folder
+* ISCSI
+    * Copy plugins/microsoft.com~iscsi.cmd into the plugin folder
+    * Build utils/iscsiHelper
+        * If you do not have visual studio & windows SDK see [vs_build](vs_build/)
+        * copy produced iscsiHelper.exe into plugin folder/microsoft.com~iscsi.cmd/
+    * Install the approrpiate Visual Studio C++ redistributuable on all nodes
+        * https://aka.ms/vs/15/release/vc_redist.x64.exe (if using vs_build)
+    * Optionally create a pr.txt file in the current working directory that corresponds to that node's SCSI PR to use
+        * If none is created a random one will be generated
+
+See https://github.com/andyzhangx/Demo/tree/master/windows/flexvolume for more info.
+
+To get logs for the plugin run `Get-EventLog -LogName Application -Source Kube* -Newest 50  | %{$_.message}`
+
  ## Plugins
+ See [sample_yamls](sample_yamls) for information how to write Persistent Volumes.
 * SMB
     * This plugin allows you to use SMB shares. 
     * **Currently there is no storage fencing**
@@ -40,25 +59,6 @@ For more info on Flexvolume see
         * **Beware the produced image file is quite large 25+GB.**
 
 
-
-## Deployment guide
-The default plugin folder location is C:\usr\libexec\kubernetes\kubelet-plugins\volume\exec\
-* SMB
-    * Copy plugins/microsoft.com~smb.cmd into the plugin folder
-* ISCSI
-    * Copy plugins/microsoft.com~iscsi.cmd into the plugin folder
-    * Copy the binary produced by iscsiHelper into microsoft.com~iscsi.cmd on the same nodes.
-    * Install the approrpiate Visual Studio C++ redistributuable on all nodes
-        * https://aka.ms/vs/15/release/vc_redist.x64.exe
-    * Optionally create a pr.txt file in the current working directory that corresponds to that node's SCSI PR to use
-        * If none is created a random one will be generated
-
-See https://github.com/andyzhangx/Demo/tree/master/windows/flexvolume for more info.
-
-To get logs for the plugin run `Get-EventLog -LogName Application -Source Kube* -Newest 50  | %{$_.message}`
-
-## Build instructions
-The only thing that needs to be built is iscsiHelper. To build it you need Visual Studio 2017 with the SDK, or use provided vs_build container.  
 
 
 
