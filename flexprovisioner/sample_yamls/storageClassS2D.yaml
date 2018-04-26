@@ -1,0 +1,18 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fast
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: microsoft.com/windows-server-storage-provisioner
+parameters:
+  s2dShareServer: nmaliwa-180425F
+  #s2dServerName: nmaliwa-180425D
+  #FS should be CSVFS_NTFS or CSVFS_ReFS (CSVFS_ReFS will reserver a chunk for its own use (600mb on 1gb))
+  # Currently Only Support CSVFS_NTFS & CSVFS_REFS
+  s2dFsType: CSVFS_NTFS
+  s2dStoragePoolFriendlyName: S2D*
+  s2dStorageTierFriendlyNames: Capacity
+  #s2dStorageTierRatios: "1"
+  s2dFullAccessUsers: ntlab
+  smbSecret: ntlab-secret

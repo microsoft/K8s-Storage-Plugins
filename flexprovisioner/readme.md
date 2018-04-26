@@ -43,7 +43,20 @@ iscsiTargetPortal | ISCSI target portal | IscsiHost1 | - [x]
 iscsiPortals | Other possible portal paths | "1.1.1.1,1.1.1.2:954" | - [ ]
 iscsiUseFixed | "true" to created fixed size disks | "false" | - [ ] *\*default false*
 
-You can configure one storage class to provision for iSCSI and/or SMB. 
+ ### S2D Parameters
+
+Name | Meaning | Example | Mandatory
+--- | --- | --- | ---
+s2dShareServer | Root name of SOFS server | nmaliwa-180425F | -[x] 
+s2dServerName | Endpoint to reach cluster | nmaliwa-180425D | -[ ] *\*s2dShareServer will be used if empty*
+s2dFsType | File system to format | CSVFS_NTFS | -[x] *\*valid values CSVFS_NTFS or CSVFS_ReFS*
+s2dStoragePoolFriendlyName | Pool to create volume in | S2D* | - [x]
+s2dStorageTierFriendlyNames | Comma deliminated tier name(s) to use | "Performance, Capacity" | - [x]
+s2dStorageTierRatios | Comma deliminated ratios to use for tiers | ".3, .7" | - [] *\*not needed if only one StorageTier, must add up to 1*
+s2dFullAccessUsers | Users to add to the share | ntlab | - [x]
+smbSecret | The secret the smb flexvolume plugin uses to talk to the share | ntlab-secret | - [x]
+
+You can configure one storage class to provision for iSCSI and/or (SMB or S2D). 
 
 ### Support notes
 * SMB
@@ -77,6 +90,18 @@ You can configure one storage class to provision for iSCSI and/or SMB.
         * ReFS is not supported as a file system
     * All nodes on storage server should have iscsi installed
         * add-windowsfeature FS-iSCSITarget-Server
+
+* S2D (Currently SOFS only)
+    * ReadWriteOnce
+        * **Becareful no fencing is provided, however locks will work**
+        * So if an app grabs their own locks you will be fine
+    * ReadWriteMany
+        * If multiple instances of App can use same data it should already be guarding with locks
+    * Notes
+        * No protection exists against stale container of accessing path
+        * SOFS file server implies CA, see https://blogs.technet.microsoft.com/filecab/2016/03/25/smb-transparent-failover-making-file-shares-continuously-available-2/
+
+        
 
 ### Environment variables
 If it is a secret first look at the environment variable and load it, otherwise we append _FILE and try to read that file.
