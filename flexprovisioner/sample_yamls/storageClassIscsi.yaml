@@ -4,7 +4,7 @@ metadata:
   name: fast
   annotations:
     storageclass.kubernetes.io/is-default-class: "true"
-provisioner: microsoft.com/foo
+provisioner: microsoft.com/windows-server-storage-provisioner
 parameters:
   #start of iscsi parameters
   iscsiLocalPath: c:\smbkube
