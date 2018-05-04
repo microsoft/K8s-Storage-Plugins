@@ -7,8 +7,13 @@ For more info on Flexvolume see
 
 
 **Code is currently alpha, names may change, all tests have not been performed**
+## Deployment guide (binary)
+Go to https://github.com/Microsoft/K8s-Storage-Plugins/releases/latest and download the latest flexvolume-windows.zip.
 
-## Deployment guide
+Extract into kubernetes volume plugin location on all Windows nodes, the default path is C:\usr\libexec\kubernetes\kubelet-plugins\volume\exec\
+Install https://aka.ms/vs/15/release/vc_redist.x64.exe on all nodes as well.
+
+## Deployment guide (source)
 The default plugin folder location in a Windows kubernetes worker node is C:\usr\libexec\kubernetes\kubelet-plugins\volume\exec\
 * SMB
     * Copy plugins/microsoft.com~smb.cmd into the plugin folder
@@ -17,8 +22,6 @@ The default plugin folder location in a Windows kubernetes worker node is C:\usr
     * Build utils/iscsiHelper
         * If you do not have Visual Studio & Windows SDK see [vs_build](vs_build/)
         * copy produced iscsiHelper.exe into plugin folder/microsoft.com~iscsi.cmd/
-    * Install the approrpiate Visual Studio C++ redistributuable on all nodes
-        * https://aka.ms/vs/15/release/vc_redist.x64.exe (if using vs_build)
     * Optionally create a pr.txt file in the current working directory that corresponds to that node's SCSI PR to use
         * If none is created a random one will be generated
 
