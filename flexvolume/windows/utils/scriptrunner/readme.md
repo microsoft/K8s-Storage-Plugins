@@ -3,6 +3,10 @@ Contains some helper files to create a kubernetes flexvolume plugin on windows i
 * scriptrunner.cmd
     * You should copy this into your project and rename it yourpluginname.cmd
     * When run it will call yourpluginname.ps1
+* scriptrunner_prod.cmd
+    * You should copy this into your project and rename it yourpluginname_prod.cmd
+    * This is the same as scriptrunner.cmd without `-ExecutionPolicy Bypass`.
+        * When releasing the files are signed and this is not needed
 * flexvolume.ps1
     * this contains some utilities to run flexvolume logic
     * copy into plugin folder
