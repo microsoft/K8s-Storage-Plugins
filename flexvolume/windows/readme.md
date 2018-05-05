@@ -11,7 +11,6 @@ For more info on Flexvolume see
 Go to https://github.com/Microsoft/K8s-Storage-Plugins/releases/latest and download the latest flexvolume-windows.zip.
 
 Extract into kubernetes volume plugin location on all Windows nodes, the default path is C:\usr\libexec\kubernetes\kubelet-plugins\volume\exec\
-Install https://aka.ms/vs/15/release/vc_redist.x64.exe on all nodes as well.
 
 ## Deployment guide (source)
 The default plugin folder location in a Windows kubernetes worker node is C:\usr\libexec\kubernetes\kubelet-plugins\volume\exec\
