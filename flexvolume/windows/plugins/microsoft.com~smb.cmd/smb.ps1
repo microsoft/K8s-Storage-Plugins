@@ -9,6 +9,21 @@ function ConstructCredential([string]$username, $passPlain)
     return New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, $securePassword 
 }
 
+# Takes in \\servername\share\path or smb://servername/share/path or //servername/share/path
+# and returns \\servername\share\path
+function MigrateLinuxCifsPathToWindows([string]$smbPath)
+{
+    if($smbPath.StartsWith('smb://','CurrentCultureIgnoreCase'))
+    {
+        $smbPath = '//' + $smbPath.SubString('smb://'.Length)
+    }
+    if($smbPath.StartsWith('//'))
+    {
+        $smbPath = $smbPath.replace('/', '\')
+    }
+    return $smbPath
+}
+
 function init()
 {
 }
@@ -18,7 +33,8 @@ function mount_command([string]$path, $options)
     $passPlain = Base64Decode $($options.'kubernetes.io/secret/password')
     $User = Base64Decode $($options.'kubernetes.io/secret/username')
     $remoteP = $options.source
-  
+    $remoteP = MigrateLinuxCifsPathToWindows -smbPath $remoteP
+
     DebugLog  $passPlain
     DebugLog  $User
 
