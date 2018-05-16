@@ -100,6 +100,7 @@ You can configure one storage class to provision for iSCSI and/or (SMB or S2D).
     * Notes
         * No protection exists against stale container of accessing path
         * SOFS file server implies CA, see https://blogs.technet.microsoft.com/filecab/2016/03/25/smb-transparent-failover-making-file-shares-continuously-available-2/
+        * Recommendation is no more than [32 volumes](https://docs.microsoft.com/en-us/windows-server/storage/storage-spaces/plan-volumes#choosing-how-many-volumes-to-create).
 
         
 
