@@ -1,5 +1,5 @@
 $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
-$logSource = "KubeMscsPdr"
+$logSource = "KubeWsfcPdr"
 
 . $PSScriptRoot\flexvolume.ps1
 function init()

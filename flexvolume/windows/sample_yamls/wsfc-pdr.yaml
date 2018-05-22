@@ -16,6 +16,6 @@ spec:
   volumes:
   - name: smb-volume
     flexVolume:
-      driver: "microsoft.com/mscs-pdr.cmd"
+      driver: "microsoft.com/wsfc-pdr.cmd"
       options:
         groupName: "DiskGroup1"
