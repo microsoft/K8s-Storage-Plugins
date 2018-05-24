@@ -6,7 +6,6 @@ For more info on Flexvolume see
  * https://docs.openshift.org/latest/install_config/persistent_storage/persistent_storage_flex_volume.html#flex-volume-drivers-without-master-initiated-attach-detach
 
 
-**Code is currently alpha, names may change, all tests have not been performed**
 ## Deployment guide (binary)
 Go to https://github.com/Microsoft/K8s-Storage-Plugins/releases/latest and download the latest flexvolume-windows.zip.
 
