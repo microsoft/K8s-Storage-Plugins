@@ -22,10 +22,25 @@ function supports_smb($options)
     return [bool] $options.parameters.smbLocalPath
 }
 
+# Takes in \\servername\share\path or smb://servername/share/path or //servername/share/path
+# and returns \\servername\share\path
+function MigrateLinuxCifsPathToWindows([string]$smbPath)
+{
+    if($smbPath.StartsWith('smb://','CurrentCultureIgnoreCase'))
+    {
+        $smbPath = '//' + $smbPath.SubString('smb://'.Length)
+    }
+    if($smbPath.StartsWith('//'))
+    {
+        $smbPath = $smbPath.replace('/', '\')
+    }
+    return $smbPath
+}
+
 function provision_smb($options)
 {
     $name = $options.name
-    $remotePath = $options.parameters.smbShareName
+    $remotePath = MigrateLinuxCifsPathToWindows -smbPath $options.parameters.smbShareName
     $localPath = $options.parameters.smbLocalPath
     $serverName = $options.parameters.smbServerName
     $secret = $options.parameters.smbSecret
