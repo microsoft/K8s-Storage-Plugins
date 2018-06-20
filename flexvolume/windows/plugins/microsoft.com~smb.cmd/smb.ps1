@@ -1,4 +1,4 @@
-$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
+$global:ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 $logSource = "KubeSMB"
 
 . $PSScriptRoot\flexvolume.ps1

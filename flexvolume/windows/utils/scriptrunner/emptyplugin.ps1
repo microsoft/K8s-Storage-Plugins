@@ -1,3 +1,4 @@
+$global:ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 $logSource = "YourPluginNameLogSourceName"
 
 . $PSScriptRoot\flexvolume.ps1
