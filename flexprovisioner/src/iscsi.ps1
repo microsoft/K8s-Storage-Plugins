@@ -74,6 +74,7 @@ function provision_iscsi($options)
     $server = $options.parameters.iscsiServerName
     $authType = $options.parameters.iscsiAuthType
     $portals = $options.parameters.iscsiPortals
+    $targetPortal = $options.parameters.iscsiTargetPortal
     
     $path = join-path $localPath "$name.vhdx"
     $requestSize = $options.volumeClaim.spec.resources.requests.storage
@@ -82,6 +83,10 @@ function provision_iscsi($options)
     if($options.parameters.iscsiUseFixed -eq "true")
     {
         $isFixed = "true"
+    }
+    if(-not $server)
+    {
+        $server = $targetPortal
     }
 
     DebugLog "Loading Secrets"
@@ -128,7 +133,7 @@ function provision_iscsi($options)
                 "options" = @{
                     "chapAuthDiscovery" = $options.parameters.iscsiChapAuthDiscovery;
                     "chapAuthSession" = $options.parameters.iscsiChapAuthSession;
-                    "targetPortal" = $options.parameters.iscsiTargetPortal;
+                    "targetPortal" = $targetPortal;
                     "iqn" = $iqn;
                     "lun" = "0";
                     "authType" = $authType;

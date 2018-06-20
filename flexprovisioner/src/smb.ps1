@@ -37,12 +37,22 @@ function MigrateLinuxCifsPathToWindows([string]$smbPath)
     return $smbPath
 }
 
+function GetServerNameOrParseSharename([string] $serverName, [string]$shareName)
+{
+    if($serverName)
+    {
+        return $serverName
+    }
+    # returns from format take '\\<server>\'
+    return $shareName.split('\')[2]
+}
+
 function provision_smb($options)
 {
     $name = $options.name
     $remotePath = MigrateLinuxCifsPathToWindows -smbPath $options.parameters.smbShareName
     $localPath = $options.parameters.smbLocalPath
-    $serverName = $options.parameters.smbServerName
+    $serverName = GetServerNameOrParseSharename -serverName $options.parameters.smbServerName -shareName $remotePath
     $secret = $options.parameters.smbSecret
     
     $path = $remotePath + '\' + $name
