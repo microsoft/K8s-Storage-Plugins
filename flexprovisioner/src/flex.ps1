@@ -1,5 +1,4 @@
 $global:ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
-$logSource = "KubeFlex"
 
 . $PSScriptRoot\flexvolume.ps1
 . $PSScriptRoot\iscsi.ps1
