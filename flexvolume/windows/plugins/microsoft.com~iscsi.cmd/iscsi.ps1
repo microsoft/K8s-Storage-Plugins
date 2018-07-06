@@ -63,20 +63,21 @@ Function GetPortal(
 )
 {    
     Log "Connecting to iscsi portal $targetPortal"
-    $newPortal = 'param($targetPortal) New-IscsiTargetPortal -TargetPortalAddress $targetPortal'
+    $targetPortalParams = @{}
     if($port)
     {
         Log "using port $port"
-        $newPortal = $newPortal + " -TargetPortalPortNumber $port"
+        $targetPortalParams.TargetPortalPortNumber = $port
     }
     if($discoveryChapSecret)
     {
         Log "using discovery secrets"
-        $newPortal = $newPortal + " -AuthenticationType $authType -ChapUsername $discoveryChapUsername -ChapSecret $discoveryChapSecret"
+        $targetPortalParams.AuthenticationType = $authType
+        $targetPortalParams.ChapUsername = $discoveryChapUsername
+        $targetPortalParams.ChapSecret = $discoveryChapSecret
     }
-    DebugLog "full command to portal is: $newportal"
     
-    DoCommand $newPortal $true @($targetPortal)
+    New-IscsiTargetPortal -TargetPortalAddress $targetPortal @targetPortalParams
 }
 
 Function ConnectTarget(
@@ -94,25 +95,26 @@ Function ConnectTarget(
     #deal with racing connection attempts by just blindly connecting and ignoring errors
     #if there is an error & not connected 
     #try again and let that error bubble up
-    $connectTarget = 'param($target) $target | Connect-IscsiTarget -reporttopnp $true' 
-    $connectTarget +=" -TargetPortalAddress $($portal.TargetPortalAddress) -TargetPortalPortNumber $($portal.TargetPortalPortNumber)"
+    $connectTargetParams = @{}
     if($sessionChapSecret)
     {
         Log "connecting with session secret"
-        $connectTarget = $connectTarget + " -AuthenticationType $authType -ChapUsername $sessionChapUsername -ChapSecret $sessionChapSecret"
+        $connectTargetParams.AuthenticationType = $authType
+        $connectTargetParams.ChapUsername = $sessionChapUsername
+        $connectTargetParams.ChapSecret = $sessionChapSecret
     }
     if($multiPathEnabled)
     {
         Log "connecting with multipath enabled"
-        $connectTarget = $connectTarget + ' -IsMultipathEnabled $true'
+        $connectTargetParams.IsMultipathEnabled = $true
     }
     if($eatExceptions)
     {
-        $connectTarget = $connectTarget + ' -ErrorAction ignore'
+        $connectTargetParams.ErrorAction = [System.Management.Automation.ActionPreference]::Ignore
     }
-    DebugLog "full command to target is: $connectTarget"
+    DebugLog "connecting to target: $target"
 
-    DoCommand -command $connectTarget -throw $true -objectList @($target) | Out-Null
+    $target | Connect-IscsiTarget -reporttopnp $true -TargetPortalAddress $portal.TargetPortalAddress -TargetPortalPortNumber $portal.TargetPortalPortNumber @connectTargetParams | Out-Null
 }
 Function GetTargetForPortals(
     $portals,
