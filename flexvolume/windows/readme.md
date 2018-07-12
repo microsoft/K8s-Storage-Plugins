@@ -5,8 +5,8 @@ For more info on Flexvolume see
  * https://github.com/kubernetes/community/blob/master/contributors/devel/flexvolume.md
  * https://docs.openshift.org/latest/install_config/persistent_storage/persistent_storage_flex_volume.html#flex-volume-drivers-without-master-initiated-attach-detach
 
-Supported on version Kubernetes v1.11.0-beta.0 or higher, as it needs [PR 63272](https://github.com/kubernetes/kubernetes/pull/63272).
-## Deployment guide (binary)
+Supported on version Kubernetes v1.9.9 or higher
+
 Go to https://github.com/Microsoft/K8s-Storage-Plugins/releases/latest and download the latest flexvolume-windows.zip.
 
 Extract into kubernetes volume plugin location on all Windows nodes, the default path is C:\usr\libexec\kubernetes\kubelet-plugins\volume\exec\
