@@ -2,10 +2,91 @@ $debug_mode = $true
 $exitCode = 0
 $logName = "Application"
 $logId = 1
+$logSource = "KubeFlex"
 
 if($logSource -eq $null)
 {
     throw "Define logSource before including this script"
+}
+
+Function RemotelyInvoke([string]$ComputerName, [ScriptBlock]$ScriptBlock, $ArgumentList = @(), $credential = $null)
+{
+    if($credential){
+        return Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $argumentlist -erroraction Stop -Credential $credential
+    }
+    else {
+        return Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $argumentlist -erroraction Stop                
+    }
+}
+
+function DeleteRemotePath([string]$pathToDelete, [string]$ComputerName, $credential = $null)
+{
+    DebugLog "deleting $path"
+    RemotelyInvoke -ComputerName $ComputerName -ScriptBlock {
+        param($path)
+        if(test-path $path){
+            $empty = rmdir $path -Force -Recurse -ErrorAction Stop 2>&1 
+        }
+        else {
+            $parentPath = Join-Path $path ".."
+            $empty = Resolve-Path $parentPath -ErrorAction Stop
+        }
+    } -ArgumentList $pathToDelete -ErrorAction Stop  -credential $credential
+    DebugLog "Deleted path"
+}
+function EnsureRemotePathExists([string]$path, [string]$ComputerName, $credential = $null)
+{
+    DebugLog "Ensuring $path exists on server $ComputerName"
+    RemotelyInvoke -ComputerName $ComputerName -ScriptBlock {
+        param($path)
+        if(-not $(test-path $path)){
+            $empty = mkdir $path -ErrorAction Stop 2>&1
+        }
+    } -ArgumentList $path -ErrorAction Stop -credential $credential
+    DebugLog "Path $path exists on server $ComputerName"
+}
+
+function ConstructCimsession([string]$ComputerName, $credential)
+{
+    if($credential)
+    {
+        return New-CimSession -ComputerName $ComputerName -Credential $credential
+    }
+    else {
+        return New-CimSession -ComputerName $ComputerName
+    }
+}
+
+function ConvertKubeSize([string]$number)
+{
+    $sizes = @(
+        @("k", [math]::pow(10,3)),
+        @("M", [math]::pow(10,6)),
+        @("G", [math]::pow(10,9)),
+        @("T", [math]::pow(10,12)),
+        @("P", [math]::pow(10,15)),
+        @("E", [math]::pow(10,16)),
+        @("Ki", [math]::pow(2,10)),
+        @("Mi", [math]::pow(2,20)),
+        @("Gi", [math]::pow(2,30)),
+        @("Ti", [math]::pow(2,40)),
+        @("Pi", [math]::pow(2,50)),
+        @("Ei", [math]::pow(2,60)))
+
+    $multiplier = 1
+    foreach($size in $sizes)
+    {
+        if($number.EndsWith($size[0],"CurrentCultureIgnoreCase"))
+        {
+            $multiplier = $size[1]
+            $number = $number.substring(0,$number.length - $size[0].length)
+            break
+        }
+    }
+    [decimal]$dNumber = $number
+    [uint64]$uNumber = ([decimal]$multiplier) * $dNumber
+
+    $uNumber
 }
 
 #allow you to expect an item and throw a useful message
@@ -60,6 +141,23 @@ function LoadSecrets([String[]] $secrets)
         }
     }
     return $retSecrets
+}
+
+function ConstructCredential([string]$username, $passPlain)
+{
+    $securePassword = ConvertTo-SecureString -String $passPlain -AsPlainText -Force
+    return New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, $securePassword 
+}
+function GetCredential()
+{
+    $secrets = LoadSecrets -secrets @("PROVISIONER_USERNAME", "PROVISIONER_PASSWORD")
+    if($secrets["PROVISIONER_USERNAME"] -and $secrets["PROVISIONER_PASSWORD"])
+    {
+        return ConstructCredential -username $secrets["PROVISIONER_USERNAME"] -passPlain $secrets["PROVISIONER_PASSWORD"]
+    }
+    else {
+        return $null
+    }
 }
 function Log([string] $s)
 { 

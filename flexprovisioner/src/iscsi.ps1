@@ -17,13 +17,6 @@ function IscsiVirtualDiskExists($path, $server)
     return ($matched | Measure-Object).Count -ne 0
 }
 
-function GetLun($target, $disk, $computername = "localhost") 
-{
-    $luns = (Get-IscsiServerTarget -TargetName $target -computername $computername).LunMappings
-    $mapping = $luns | ? {$_.path -eq $disk } | GetFirst -message "Did not find disk $disk"
-    $lun = $mapping.Lun
-    $lun
-}
 function EnsureIscsiTargetExists(   $targetName,
                                     $computername,
                                     [string] $authType = 'NONE',
@@ -38,25 +31,22 @@ function EnsureIscsiTargetExists(   $targetName,
     }
     $target = Get-IscsiServerTarget -TargetName $targetName -ComputerName $computername -ErrorAction Stop
 
-    $chapCredential = ""
-    $rchapCredential = ""
     if($authType -ne "NONE")
     {
+        $chapParams = @{}
         $user = $chapUserName
         $pass = $chapPassword
         $password = ConvertTo-SecureString -String $pass  -AsPlainText -Force
-        $chapCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password 
-        if(AuthType -eq "ONEWAYCHAP"){
-            $empty = Set-IscsiServerTarget -TargetName $targetName -EnableChap $True -Chap $chapCredential -ErrorAction Stop
+        $chapParams.Chap = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password 
+        if($authType -eq "MUTALCHAP")
+        {
+            $user = $rchapUserName
+            $pass = $rchapPassword
+            $password = ConvertTo-SecureString -String $pass  -AsPlainText -Force
+            $chapParams.ReverseChap = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password 
+            $chapParams.EnableReverseChap = $true
         }
-    }
-    if($authType -eq "MUTALCHAP")
-    {
-        $user = $rchapUserName
-        $pass = $rchapPassword
-        $password = ConvertTo-SecureString -String $pass  -AsPlainText -Force
-        $rchapCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password 
-        $empty = Set-IscsiServerTarget -TargetName $targetName -EnableChap $True -Chap $chapCredential -EnableReverseChap $true -ReverseChap $rchapCredential -ErrorAction Stop
+        $empty = Set-IscsiServerTarget -TargetName $targetName -EnableChap $True @chapParams -ErrorAction Stop
     }
     return $target.TargetIqn.ToString()
 }
@@ -74,14 +64,19 @@ function provision_iscsi($options)
     $server = $options.parameters.iscsiServerName
     $authType = $options.parameters.iscsiAuthType
     $portals = $options.parameters.iscsiPortals
+    $targetPortal = $options.parameters.iscsiTargetPortal
     
     $path = join-path $localPath "$name.vhdx"
     $requestSize = $options.volumeClaim.spec.resources.requests.storage
     $requestSize = ConvertKubeSize $requestSize
-    $isFixed = "false"
-    if($options.parameters.iscsiUseFixed -eq "true")
+    
+    $isFixed = $options.parameters.iscsiUseFixed -eq "true"
+    $useFixedParam = @{}
+    if($isFixed){$useFixedParam.UseFixed = $true}
+
+    if(-not $server)
     {
-        $isFixed = "true"
+        $server = $targetPortal
     }
 
     DebugLog "Loading Secrets"
@@ -96,18 +91,11 @@ function provision_iscsi($options)
                                    -chapUserName $secrets:ISCSI_CHAP_USERNAME `
                                    -chapPassword $secrets:ISCSI_CHAP_PASSWORD `
                                    -rchapUserName $secrets:ISCSI_REVERSE_CHAP_USERNAME `
-                                   -rchapPassword $secrets:ISCSI_REVERSE_CHAP_PASSWORD
+                                   -rchapPassword $secrets:ISCSI_REVERSE_CHAP_PASSWORD 
     
-    if(-not $(IscsiVirtualDiskExists $path $server))
+    if(-not $(IscsiVirtualDiskExists $path $server ))
     {
-        if($isFixed -eq "true")
-        {
-            $empty = New-IscsiVirtualDisk $path -size $requestSize -computername $server -UseFixed -ErrorAction Stop 2>&1
-        }
-        else
-        {
-            $empty = New-IscsiVirtualDisk $path -size $requestSize -computername $server -ErrorAction Stop 2>&1   
-        }
+        $empty = New-IscsiVirtualDisk $path -size $requestSize -computername $server @useFixedParam -ErrorAction Stop 2>&1  
     }
 
     Add-IscsiVirtualDiskTargetMapping -TargetName $targetName $path -computername $server -ErrorAction Stop
@@ -128,7 +116,7 @@ function provision_iscsi($options)
                 "options" = @{
                     "chapAuthDiscovery" = $options.parameters.iscsiChapAuthDiscovery;
                     "chapAuthSession" = $options.parameters.iscsiChapAuthSession;
-                    "targetPortal" = $options.parameters.iscsiTargetPortal;
+                    "targetPortal" = $targetPortal;
                     "iqn" = $iqn;
                     "lun" = "0";
                     "authType" = $authType;
@@ -160,7 +148,7 @@ function delete_iscsi($options)
     if($(IscsiVirtualDiskExists $path $server))
     {
         DebugLog "deleting iscsiDisk $path on $server using local path $path"    
-        $empty = remove-IscsiVirtualDisk $path -computername $server
+        $empty = remove-IscsiVirtualDisk $path -computername $server 
     }
     DebugLog "Ensured that iscsiDisk $path on $server using local path $path was deleted"
         
