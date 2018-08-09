@@ -3,21 +3,16 @@ $IscsiSecrets = @('ISCSI_CHAP_USERNAME',
                   'ISCSI_CHAP_PASSWORD',
                   'ISCSI_REVERSE_CHAP_USERNAME',
                   'ISCSI_REVERSE_CHAP_PASSWORD' )
-function TargetExists($name, $server, $credential)
+function TargetExists($name, $server)
 {
-    $credentialParam = @{}
-    if($credential) { $credentialParam.Credential = $credential}
-
-    $servers = Get-IscsiServerTarget -ComputerName $server @credentialParam -ErrorAction Stop 
+    $servers = Get-IscsiServerTarget -ComputerName $server -ErrorAction Stop 
     $matched = $servers | ?{$_.TargetName -eq $name}
     return ($matched | Measure-Object).Count -ne 0
 }
 
-function IscsiVirtualDiskExists($path, $server, $credential)
+function IscsiVirtualDiskExists($path, $server)
 {
-    $credentialParam = @{}
-    if($credential) { $credentialParam.Credential = $credential}
-    $disks = Get-IscsiVirtualDisk -ComputerName $server @credentialParam -ErrorAction Stop 
+    $disks = Get-IscsiVirtualDisk -ComputerName $server -ErrorAction Stop 
     $matched = $disks | ?{$_.Path -eq $path}
     return ($matched | Measure-Object).Count -ne 0
 }
@@ -28,16 +23,13 @@ function EnsureIscsiTargetExists(   $targetName,
                                     [string] $chapUserName = '', 
                                     [string] $chapPassword = '', 
                                     [string] $rchapUserName = '', 
-                                    [string] $rchapPassword = '',
-                                    $credential = $null)
+                                    [string] $rchapPassword = '')
 {
-    $credentialParam = @{}
-    if($credential) { $credentialParam.Credential = $credential}
-    if(-not $(TargetExists $targetName $computername @credentialParam))
+    if(-not $(TargetExists $targetName $computername))
     {
-        $target = New-IscsiServerTarget -TargetName $targetName -ComputerName $computername -InitiatorIds "iqn:*" @credentialParam -ErrorAction Stop
+        $target = New-IscsiServerTarget -TargetName $targetName -ComputerName $computername -InitiatorIds "iqn:*" -ErrorAction Stop
     }
-    $target = Get-IscsiServerTarget -TargetName $targetName -ComputerName $computername @credentialParam -ErrorAction Stop
+    $target = Get-IscsiServerTarget -TargetName $targetName -ComputerName $computername -ErrorAction Stop
 
     if($authType -ne "NONE")
     {
@@ -54,7 +46,7 @@ function EnsureIscsiTargetExists(   $targetName,
             $chapParams.ReverseChap = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password 
             $chapParams.EnableReverseChap = $true
         }
-        $empty = Set-IscsiServerTarget -TargetName $targetName -EnableChap $True @chapParams @credentialParam Stop
+        $empty = Set-IscsiServerTarget -TargetName $targetName -EnableChap $True @chapParams -ErrorAction Stop
     }
     return $target.TargetIqn.ToString()
 }
@@ -73,9 +65,6 @@ function provision_iscsi($options)
     $authType = $options.parameters.iscsiAuthType
     $portals = $options.parameters.iscsiPortals
     $targetPortal = $options.parameters.iscsiTargetPortal
-    $credential = GetCredential
-    $credentialParam = @{}
-    if($credential) { $credentialParam.Credential = $credential}
     
     $path = join-path $localPath "$name.vhdx"
     $requestSize = $options.volumeClaim.spec.resources.requests.storage
@@ -102,15 +91,14 @@ function provision_iscsi($options)
                                    -chapUserName $secrets:ISCSI_CHAP_USERNAME `
                                    -chapPassword $secrets:ISCSI_CHAP_PASSWORD `
                                    -rchapUserName $secrets:ISCSI_REVERSE_CHAP_USERNAME `
-                                   -rchapPassword $secrets:ISCSI_REVERSE_CHAP_PASSWORD `
-                                   @credentialParam
+                                   -rchapPassword $secrets:ISCSI_REVERSE_CHAP_PASSWORD 
     
-    if(-not $(IscsiVirtualDiskExists $path $server @credentialParam))
+    if(-not $(IscsiVirtualDiskExists $path $server ))
     {
-        $empty = New-IscsiVirtualDisk $path -size $requestSize -computername $server @useFixedParam @credentialParam -ErrorAction Stop 2>&1  
+        $empty = New-IscsiVirtualDisk $path -size $requestSize -computername $server @useFixedParam -ErrorAction Stop 2>&1  
     }
 
-    Add-IscsiVirtualDiskTargetMapping -TargetName $targetName $path -computername $server @credentialParam -ErrorAction Stop
+    Add-IscsiVirtualDiskTargetMapping -TargetName $targetName $path -computername $server -ErrorAction Stop
     
     $lun = 0
     
@@ -145,27 +133,24 @@ function delete_iscsi($options)
 {   
     $path = $options.volume.spec.flexVolume.options.localPath
     $server = $options.volume.spec.flexVolume.options.serverName
-    $credential = GetCredential
-    $credentialParam = @{}
-    if($credential) { $credentialParam.Credential = $credential}
 
     $name = $options.volume.metadata.name
 
-    if($(TargetExists $name $server $credential))
+    if($(TargetExists $name $server))
     {
         DebugLog "Removing iscsi target $name on server $server no longer exists"
         #the goal of this set is to disconnect all people using this target
-        Set-IscsiServerTarget $name  -InitiatorIds "iqn:none" -ComputerName $server @credentialParam -ErrorAction Stop
-        remove-IscsiServerTarget  $name -ComputerName $server @credentialParam -ErrorAction Stop
+        Set-IscsiServerTarget $name  -InitiatorIds "iqn:none" -ComputerName $server -ErrorAction Stop
+        remove-IscsiServerTarget  $name -ComputerName $server -ErrorAction Stop
     }
     DebugLog "Ensured iscsi target $name on server $server no longer exists"
     
-    if($(IscsiVirtualDiskExists $path $server $credential))
+    if($(IscsiVirtualDiskExists $path $server))
     {
         DebugLog "deleting iscsiDisk $path on $server using local path $path"    
-        $empty = remove-IscsiVirtualDisk $path -computername $server @credentialParam 
+        $empty = remove-IscsiVirtualDisk $path -computername $server 
     }
     DebugLog "Ensured that iscsiDisk $path on $server using local path $path was deleted"
         
-    DeleteRemotePath $path -ComputerName $server @credentialParam
+    DeleteRemotePath $path -ComputerName $server
 }
