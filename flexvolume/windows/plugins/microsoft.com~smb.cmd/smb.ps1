@@ -43,7 +43,7 @@ function mount_command([string]$path, $options)
     $Credential = ConstructCredential -username $User -passPlain $passPlain
   
     Log  "smbGlobal"
-    $s = New-SmbGlobalMapping  -RemotePath $remoteP -Credential $Credential 2>&1
+    $s = New-SmbGlobalMapping  -RemotePath $remoteP -Credential $Credential -persistent $false 2>&1
     Log  $s
   
     MakeSymLink $path $remoteP
