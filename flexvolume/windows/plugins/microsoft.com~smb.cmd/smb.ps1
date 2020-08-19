@@ -32,6 +32,11 @@ function mount_command([string]$path, $options)
 {  
     $passPlain = Base64Decode $($options.'kubernetes.io/secret/password')
     $User = Base64Decode $($options.'kubernetes.io/secret/username')
+    if ($options.'kubernetes.io/secret/domain') {
+      $Domain = Base64Decode $($options.'kubernetes.io/secret/domain')
+      $User = "$Domain\$User"
+    }
+    
     $remoteP = $options.source
     $remoteP = MigrateLinuxCifsPathToWindows -smbPath $remoteP
 
